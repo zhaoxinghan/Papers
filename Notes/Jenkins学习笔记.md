@@ -1,6 +1,6 @@
-# Jenkins学习笔记（）
+# Jenkins学习笔记（一）
 
-Jenkins2 权威指南学习笔记
+《Jenkins2 权威指南》学习笔记
 
 ## 基础
 
