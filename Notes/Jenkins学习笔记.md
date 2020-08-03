@@ -135,7 +135,7 @@ properties([pipelineTriggers([pollSCM('*/30 * * * *')])])
 
 限制某个行为发生时脚本花费的时间。
 
-```groove
+```groovy
 node {
     def response
     stage('input') {
@@ -158,14 +158,15 @@ node {
 
 #### 睡眠(sleep)
 
-```groove
+```groovy
 sleep time:5, unit: 'MINUTES'
 ```
 
 #### 等待直到(waitUntil)
 
-```groove
-waitUntil { //返回true或false的过程}
+```groovy
+waitUntil { //返回true或false的过程
+}
 ```
 
 ### 处理并发
@@ -176,7 +177,7 @@ waitUntil { //返回true或false的过程}
 
 在传统的并行语法中，Jenkins可以在空闲的节点或指定的节点中运行parallel步骤。
 
-```groove
+```groovy
 node('worker_node1') {
     stage("parallel Demo") {
         //并行的运行步骤
@@ -196,6 +197,105 @@ node('worker_node1') {
     }
 }
 ```
+
+#### 获取和保存文件-stash和unstash
+
+stash和unstash函数允许在流水线的节点间和/或阶段间保存和获取文件，通过名称和/或模式来指定一个被包括或被排除的文件的集合，给这些文件的暂存处命名，以便后面通过这个名称使用这些文件。
+
+```groovy
+stash name: "<name>" [includes: "<pattern>" excludes: "<pattern>"]
+
+unstash "<name>"  //创建副本
+```
+
+一个测试的例子
+
+```groovy
+stages("Source") {
+    stage("source") {
+        git branch: 'test', rul: 'git@diyv:repos/gradle-greetings'
+        stash name: 'test-source', includes: 'build.gradle, src/test/'
+    }
+
+    ……
+
+    stage("Test") {
+        //并行的执行需要的单元测试
+
+        parallel (
+            master: {node ('master'){
+                unstash 'test-sources'  //这里在master节点上创建副本
+                sh '/opt/gradle-2.7/bin/gradle -D test.single = TestExample1 test'
+            }}
+            worker2: { node ('worker_node2') {
+                unstash 'test-sources'
+                sh '/opt/gradle-2.7/bin/gradle -D test.single=TestExample2 test'
+            }},
+        )
+    }
+}
+```
+
+#### 快速失败fastFail
+
+当一个分支失败就快速退出所有步骤时使用fastFail。
+
+使用方法：在parallel的括号的参数中加入`failFast: true`。
+
+### 条件执行
+
+Jenkins中可以使用groovy语言来实现条件执行。
+
+对于脚本式流水线，使用if实现条件执行，其语法规则和java基本一样。
+
+对于声明式流水线，使用when形式来测试一个或者多个表达式模块是否为true,如果为true,阶段中剩下的代码才会执行。
+
+### 构建后的处理
+
+在脚本式流水线，我们可以使用try-catch-finally来实现一系列的执行过程，jenkins还提供了catchError来实现更高级的一些用法。
+
+在声明式的流水线，我们可以通过添加post结构来实现构建后处理。
+
+|条件| 描述|
+|--|---|
+|always| 总是执行代码中的模块步骤|
+|changed| 如果当前构建的状态与先前构建的状态不同，则执行代码块中的步骤|
+|success| 如果当前构建状态为成功的，则执行代码块中的步骤 |
+|failure| 如果当前构建状态为失败的，则执行代码块中的步骤|
+|unstable| 如果当前构建状态为不稳定的，则执行代码块中的步骤|
+
+例子：
+```groovy
+    }
+}   //阶段结尾
+post {
+    always {
+        echo 'build stage complete'
+    }
+    failure {
+        echo 'Build failed'
+        mail body: 'build failed', subject: 'build failed', to: 'devops@company.com'
+    }
+    success {
+        echo "build succeeded"
+        mail body: 'build succeeded', subject: 'Build Succeeded' to: 'devops@company.com'
+    }
+}
+```
+
+## jenkins里的通知
+
+- 电子邮件
+- slack通知
+- HipChat通知
+- HTML报告
+
+（这一章需要用到的时候在查吧）
+
+## 安全
+
+
+
 
 
 
