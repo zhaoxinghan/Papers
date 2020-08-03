@@ -99,11 +99,103 @@ triggers{cron(H(0,30) * * * *)}
 ```
 cron还有很多高级用法，真正用到的时候在查吧。
 
+#### 使用GitHub钩子触发器来触发构建
 
+如果代码源是GitHub项目，那么可以在GitHub上设置推钩来触发项目构建。当设置好后，当有代码推送到代码库就会发射推钩触发Jenkins，从而调用Jenkins SCM轮询功能。
 
+脚本中的属性语法如下：
+```groovy
+properties([pipelineTriggers([githubPush()])])
+```
 
+#### SCM轮询功能
 
+周期性的扫描源码版本控制系统，如果发现更新，就会处理这些变化。
 
+```groovy
+properties([pipelineTriggers([pollSCM('*/30 * * * *')])])
+```
+
+#### 静默期
+
+构建触发到执行之间的等待时间
+
+#### 远程构建触发
+
+访问特定的URL来触发构建
+
+### 输入
+
+任务可以根据用户输入改变其行为
+（具体的参数设置用到的时候在查吧）
+
+### 流程控制
+
+#### 超时（TimeOut）
+
+限制某个行为发生时脚本花费的时间。
+
+```groove
+node {
+    def response
+    stage('input') {
+        try {
+            timeout(time:10, unit:'SECOND') {
+                response  = input message :'USER',
+                parameters:[string(defaultValue: 'user1',
+                description:'Enter Userid:', name:'userid')]
+            }
+        }
+        catch (err) {
+            response = 'user1'
+        }
+    }
+}
+```
+#### 重试（retry）
+
+将代码有异常发生时，重试的闭包代码会发生n次。
+
+#### 睡眠(sleep)
+
+```groove
+sleep time:5, unit: 'MINUTES'
+```
+
+#### 等待直到(waitUntil)
+
+```groove
+waitUntil { //返回true或false的过程}
+```
+
+### 处理并发
+
+- 可以使用lock对节点的资源加锁
+- 使用milestone来控制并发数量
+- 使用disableConcurrentBuilds()在多分支流水线中限制并发
+
+在传统的并行语法中，Jenkins可以在空闲的节点或指定的节点中运行parallel步骤。
+
+```groove
+node('worker_node1') {
+    stage("parallel Demo") {
+        //并行的运行步骤
+
+        //用于存储步骤的映射
+        def stepToRun = [:]
+
+        for (int i =1; i <5; i++) {
+            stepsToRun["steps{i}"] = {node {
+                echo "start" sleep 5
+                echo "done"
+            }}
+        }
+        //这里才是真正的并行运行开始
+        //以一个映射作为参数
+        parallel stepsToRun
+    }
+}
+```
 
 
 
