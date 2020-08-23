@@ -349,4 +349,68 @@ steps部分内部，我们可以合法的使用任何DSL语句。
 
 #### agent
 
+指定流水线或特定阶段在哪里运行，和node用法类似。在靠近pipeline代码的顶部，必须要有一个agent指令用来指定“默认”的执行节点。这个agent指令所做的事情，实际上就是指定哪一个节点去执行流水线或阶段。一共有三种用法：
 
+- agent any 表示该流水线或阶段可以运行在任何一个定义好的代理节点上。
+- angent none 不打算为流水线指定一个全剧代理节点，表示如果有必要，需要为单个阶段指定一个代理节点。
+- agent { label "<label>"} 该流水线或阶段可以运行在任何一个具有`<label>`标签的代理节点上。
+
+##### 使用docker
+
+在agent声明中，有两种快速获得docker镜像的方法——指定一个已经存在的镜像或者从Dockerfile创建一个镜像。
+
+格式：
+
+```groovy
+agent {docker '<image>'}    //在一个动态分配的节点上，从docker hub拉取指定镜像，在基于该镜像的容器中运行这个流水线或者阶段
+```
+
+```cpp
+agent { docker { <elements>}}   //这个长句法允许定义更多的Docker代理阶段的细节，可以添加3个额外的元素到声明{}中去。
+
+    image '<image>'     //告诉jenkins去拉取特定的镜像以及用它来运行流水线代码
+    label '<label>'     //告诉jenkins在一个匹配<label>的节点上实力话并控制该容器
+    args '<string>'     //告诉jenkins把这些参数传递给Docker容器，与Docker平时使用的参数一致
+```
+
+```c
+agent { dockerfile true }   //假设在代码仓库中有Dockerfile，将告诉jenkins使用该文件构建Docker镜像，实例化该容器，然后在哪个容器中运行流水线代码。
+```
+
+#### environment
+
+该指令允许你为环境变量指定名称和值，这些环境变量在你的流水线范围内都是可以访问的。
+
+```groovy
+environment {
+    TIMEZONE = "eastern"
+}
+```
+
+在该代码块中，可以将凭证ID赋值给一个全局变量，然后就可以在流水线中使用这个变量来代替这个ID。
+
+#### tools
+
+tools时令可以让我们指定哪些工具需要在我们已经选择的代理节点上自动安装在配置路径下。如果没有明确指定代理节点，tools指令不会起任何作用。
+
+在声明式语法中可以指定的合法的工具类型如下：
+
+- ant
+- git
+- gradle
+- idk
+- jgit
+- jgitapache
+- maven
+
+#### options
+
+可以用来指定一些属性和值，这些预定义的选项可以应用到整个流水线，可以把它理解成一个用来设置Jenkins所定义的项目选项的地方。
+
+#### triggers
+
+这个指令允许你指定使用什么类型的触发器来启动你的流水线构建。这些构建并不适用于多分枝流水线。
+
+- cron 有规律的间隔执行流水线
+- upstream 任务运行结束并且结果与阈值匹配时，当前的流水线就会被重新触发。
+- githubPush GitHub钩子触发SCM查询
