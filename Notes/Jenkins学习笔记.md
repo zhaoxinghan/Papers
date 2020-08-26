@@ -414,3 +414,45 @@ tools时令可以让我们指定哪些工具需要在我们已经选择的代理
 - cron 有规律的间隔执行流水线
 - upstream 任务运行结束并且结果与阈值匹配时，当前的流水线就会被重新触发。
 - githubPush GitHub钩子触发SCM查询
+
+#### parameters
+
+为一个声明式流水线指定项目参数。一旦在parameters代码块中定义了一个参数，就可以在流水线中通过params命名空间按照`params.<paramter_name>`的格式引用这个参数。
+
+```pipeline
+pipeline {
+    agent any
+    parameters {
+        string(defaultValue: "maintainer",
+            description: 'Enter user role:', name: 'userRole')
+    }
+    stages {
+        stage('listVals') {
+            steps {
+                echo "user's role = ${params.userRole}"
+            }
+        }
+    }
+}
+```
+
+#### libraries
+
+这个指令允许声明式流水线导入共享库。
+
+### Stages
+
+在一个声明式流水线中，单个阶段的集合被封装在stages部分，这使得我们的声明式流水线更加结构化，能够告诉Jenkins这些阶段从哪里开始到哪里结束。
+
+#### stage
+
+stages里边的单独阶段，包含一个单独的名称和一个或多个DSL步骤，还可以有自己的environment，tools和agent指令。
+
+#### steps
+
+steps代码块是每一个stage必须的，表明一个阶段中实际要发生的工作。
+
+在一个流水线中，可以基于该阶段开头所定义的一组条件来执行这个steps部分。
+
+
+
