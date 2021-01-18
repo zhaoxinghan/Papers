@@ -2,7 +2,7 @@ import pymysql
 from ImportSettings import ImportSettings
 from Singleton import Singleton
 
-class DatabaseOperation2(Singleton):
+class DatabaseOperation(Singleton):
     def __init__(self):
         self.__connection = None
         self.__databaseSetting = ImportSettings()
@@ -27,9 +27,6 @@ class DatabaseOperation2(Singleton):
             cursor.close()
         return rows
 
-x = DatabaseOperation2()
-x2 = DatabaseOperation2()
-sql = "create table if not exists testtable3 (id INT NOT NULL Auto_increment, name VARCHaR(255) NOT NULL, PRIMARY KEY (id));"
-x.ExcuteSQL(sql)
+
     
         

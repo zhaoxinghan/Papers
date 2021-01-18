@@ -1,5 +1,6 @@
 import json
 import os
+from Singleton import Singleton
 
 class ImportSettings:
     host = "localhost"
@@ -11,7 +12,6 @@ class ImportSettings:
     def __init__(self,fileName = "Settings.json"):
         with  open(os.path.dirname(os.path.abspath(__file__))+"/"+fileName,'r') as jsonFile:
             jsonStr = jsonFile.read()
-
         print(jsonStr)
         jsonObject = json.loads(jsonStr)
 
@@ -21,3 +21,5 @@ class ImportSettings:
         self.password = jsonObject["DatabaseSetting"]["password"]
         self.dbName = jsonObject["DatabaseSetting"]["dbName"]
 
+        # Table description files directory
+        self.tablesDirectory = os.path.dirname(os.path.abspath(__file__))+jsonObject["TableDirectory"]

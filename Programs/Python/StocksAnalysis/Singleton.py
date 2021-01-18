@@ -1,4 +1,8 @@
+# File: Singleton.py
+# This is the singleton pattern class
+
 import threading
+
 
 class Singleton(object):
     _instance_lock = threading.Lock()
