@@ -1,29 +1,35 @@
 import pymysql
 from ImportSettings import ImportSettings
+from Singleton import Singleton
 
-class DatabaseOperation:
-
+class DatabaseOperation2(Singleton):
     def __init__(self):
+        self.__connection = None
+        self.__databaseSetting = ImportSettings()
         return
-    
-    def ConnectDB(self):
-        settingObj = ImportSettings()
-        #settingObj.ImportJsonFile()
-        connection = pymysql.connect(
-            host=settingObj.host,
-            user=settingObj.userName,
-            password = settingObj.password,
-            database =settingObj.dbName,
-            cursorclass=pymysql.cursors.DictCursor
-        )
-        with connection:
-            with connection.cursor() as cursor:
-                sql = "Create table if not exists aTestTable2 (id INT NOT NULL AUTO_INCREMENT, email varchar(255) NOT NULL, PRIMARY KEY (id)) ENGINE=InnoDB DEFAULT CHARSET=utf8;"
-                cursor.execute(sql)
-            connection.commit()
-        
-        return 0
-x= DatabaseOperation()
-y=x.ConnectDB()
-print(y)
 
+    def __Connect(self):
+        if(self.__connection == None):
+            self.__connection = pymysql.connect(
+                host=self.__databaseSetting.host,
+                user=self.__databaseSetting.userName,
+                password = self.__databaseSetting.password,
+                database =self.__databaseSetting.dbName,
+            )
+            print(self.__connection)
+        return self.__connection
+    
+    def ExcuteSQL(self,sql):
+        with self.__Connect().cursor() as cursor:
+            cursor.execute(sql)
+            rows = cursor.fetchall()
+            self.__connection.commit()
+            cursor.close()
+        return rows
+
+x = DatabaseOperation2()
+x2 = DatabaseOperation2()
+sql = "create table if not exists testtable3 (id INT NOT NULL Auto_increment, name VARCHaR(255) NOT NULL, PRIMARY KEY (id));"
+x.ExcuteSQL(sql)
+    
+        
