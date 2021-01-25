@@ -44,14 +44,16 @@ class StockBase():
             )
         elif(stockTableName == 'TransHistory'):     # Transaction history table  
 
+            ts.set_token('79cfeef7606afc45b9676ddcf9937471802ae79224210f48c6a28536')
             # loop each day in the date zone 2010.1.1 to Nowaday
             startDate = date(year=2010,month = 1,day = 1)
-            endDate = date.today - timedelta(days=1)    # end date is yesterday
-
+            endDate = date.today() - timedelta(days=1)    # end date is yesterday
+            
+            # loop every day for the transaction history
             i = startDate
             while i<=endDate:
 
-                df = ts.get_tick_data(str(rs_index),date=i,retry_count=3,pause = 1,src='tt')
+                df = ts.get_tick_data('000001', date = '2019-12-12',src = 'tt')
                 if df != None:
                     col_name = df.columns.tolist()
                     col_name.insert(0,"ts_code")    #add a column 'ts_code'
@@ -82,7 +84,9 @@ class StockBase():
         return
 
 x = StockBase()
-x.GetStockTable('TransHistory')
+# x.GetStockTable('TransHistory')
+x.GetStockTable('stock_basic','600050')
+x.GetStockTable('TransHistory','688981')
 
 
         
