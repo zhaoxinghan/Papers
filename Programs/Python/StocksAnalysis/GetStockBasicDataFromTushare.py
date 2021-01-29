@@ -17,10 +17,7 @@ class GetStockBasicDataFromTushare:
         file = CreateTableFromFile().CreateTable('stock_basic')
         return
     
-    def ExportData2Table(self):
-        self.CreateTable()
-        data = self.GetStockBasicData()
-        for stock_basic in data:
+
             
 
 
