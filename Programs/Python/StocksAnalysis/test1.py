@@ -76,14 +76,17 @@ print("The sum of the cross point is as following:")
 print(df1['cross'].value_counts()) 
 
 
-# then we will find the max price next several days
+# then we will find the max price in next several days
 # you can change the variable winningDay to set the period. 
 winCount = 0
-winningDay = 20
+winningDay = 10
+count = 0
 df2 = df1[df1.cross == 1]
 for index,row in df2.iterrows():
-    s = df1.loc[index:(index+winningDay), ['close']]
+    count+=1
+    s = df1.loc[index:(index+winningDay), ['high']]
     s_max = s.max()
-    if(s_max['close'] / row['close'] > 1.05):
+    if(s_max['high'] / row['close'] > 1.05):
         winCount+=1
-        print("find a win point! Now the sum of the win count is "+ str(winCount))
+print('we find the total sum of the win point is '+ str(winCount))
+print('The percent of the win points is {:.0%}'.format(winCount/count))
